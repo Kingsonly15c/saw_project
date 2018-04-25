@@ -1,0 +1,113 @@
+<modification>
+	<id>tshirtecommerce</id>
+	<version>4.2.1</version>
+	<vqmver>2.4.0</vqmver>
+	<author>Tshirtecommerce Team</author>
+	
+	<file name="admin/controller/common/logout.php,system/storage/modification/admin/controller/common/logout.php">
+		<operation error="skip">
+			<search position="after"><![CDATA[$this->user->logout();]]></search>
+			<add><![CDATA[
+				unset($_SESSION['is_admin']);
+				unset($this->session->data['is_admin']);
+			]]></add>
+		</operation>
+	</file>
+	<file name="admin/controller/common/header.php,system/storage/modification/admin/controller/common/header.php">
+		<operation error="skip">
+			<search position="before"><![CDATA[$this->document->getStyles()]]></search>
+			<add><![CDATA[
+				$this->document->addStyle('view/stylesheet/tshirtecommerce.css');
+			]]></add>
+		</operation>
+	</file>
+	<!-- back-office menu -->
+	<file name="admin/controller/common/column_left.php,system/storage/modification/admin/controller/common/column_left.php">
+		<operation error="skip">
+			<search position="before"><![CDATA[$catalog = array();]]></search>
+			<add><![CDATA[
+				$tshirtecommerce = array();
+				if (!isset($this->tshirtecommerce_campaign)) $this->tshirtecommerce_campaign = 0;
+				if ($this->user->hasPermission('access', 'catalog/tshirtecommerce')) {	
+					$tshirtecommerce[] = array(
+						'name' => 'Product Build',
+						'href' => $this->url->link('catalog/tshirtecommerce/index', 'user_token='.$this->session->data['user_token'], true),
+						'children' => array()		
+					);	
+				}
+				if ($this->user->hasPermission('access', 'extension/module/tshirtecommerce')) {	
+					$tshirtecommerce[] = array(
+						'name' => 'Settings',
+						'href' => $this->url->link('extension/module/tshirtecommerce', 'user_token='.$this->session->data['user_token'], true),
+						'children' => array()		
+					);
+					if (isset($this->tshirtecommerce_campaign) && $this->tshirtecommerce_campaign == 1) {
+						$tshirtecommerce[] = array(
+							'name' => 'Campaign',
+							'href' => $this->url->link('tshirtecommerce/tshirtecommercecampaign', 'user_token='.$this->session->data['user_token'], true),
+							'children' => array()		
+						);
+						$tshirtecommerce[] = array(
+							'name' => 'Withdrawals',
+							'href' => $this->url->link('tshirtecommerce/tshirtecommercecampaign/withdrawals', 'user_token='.$this->session->data['user_token'], true),
+							'children' => array()		
+						);
+					}
+					$tshirtecommerce[] = array(
+						'name' => 'Update',
+						'href' => $this->url->link('catalog/tshirtecommerce/update', 'user_token='.$this->session->data['user_token'], true),
+						'children' => array()		
+					);		
+				}
+				if ($tshirtecommerce) {
+					$data['menus'][] = array(
+						'id' => 'menu-tshirtecommerce',
+						'icon' => 'fa-tshirtecommerce', 
+						'name' => 'T-Shirt eCommerce',
+						'href' => '',
+						'children' => $tshirtecommerce
+					);		
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file name="catalog/controller/account/account.php,system/storage/modification/catalog/controller/account/account.php">
+		<operation error="skip">
+			<search position="after"><![CDATA[$data['credit_cards'] = array();]]></search>
+			<add><![CDATA[
+				$logged = array(
+					'login' => true,
+					'email' => $this->customer->getEmail(),
+					'id' => $this->customer->isLogged()
+				);
+				$_SESSION['is_logged'] = $logged;
+				$this->session->data['is_logged'] = $logged;
+			]]></add>
+		</operation>
+	</file>
+	<file name="catalog/controller/checkout/login.php,system/storage/modification/catalog/controller/checkout/login.php">
+		<operation error="skip">
+			<search position="before"><![CDATA[$activity_data = array(]]></search>
+			<add><![CDATA[
+				$logged = array(
+					'login' => true,
+					'email' => $this->customer->getEmail(),
+					'id' => $this->customer->getId()
+				);
+				$_SESSION['is_logged'] = $logged;
+				$this->session->data['is_logged'] = $logged;
+			]]></add>
+		</operation>
+	</file>
+	<file name="catalog/controller/account/logout.php,system/storage/modification/catalog/controller/account/logout.php">
+		<operation error="skip">
+			<search position="after"><![CDATA[$this->customer->logout();]]></search>
+			<add><![CDATA[
+				unset($_SESSION['is_logged']);
+				unset($this->session->data['is_logged']);
+			]]></add>
+		</operation>
+	</file>
+	
+</modification>
